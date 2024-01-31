@@ -20,12 +20,16 @@ def calculatedistance(
         # 0 to 0 will not matter as matrix is 0
         # depot is part of selection cities
         distanceMatrix = alldistanceMatrix[i]
-        row_edge_distances = distanceMatrix[decoded_city[:-1], decoded_city[1:]]
-        row_sum = torch.sum(row_edge_distances)
+        zero_decoded_city = torch.zeros((len(decoded_city) + 1)).long()
+
+        zero_decoded_city[1:] = decoded_city
+        row_edge_distances = distanceMatrix[
+            zero_decoded_city[:-1], zero_decoded_city[1:]
+        ]
         completebatch.append(row_edge_distances)
     batch_rewards = torch.stack(completebatch, axis=1)
     # reward is 0 at the start
-    rewards[:, 1:] = batch_rewards.permute(1, 0)
+    rewards = batch_rewards.permute(1, 0)
     return rewards
 
 
